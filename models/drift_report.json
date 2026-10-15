@@ -1,0 +1,80 @@
+{
+  "timestamp": "2026-10-15T23:48:05.403390+00:00",
+  "reference_records": 70083,
+  "current_records": 17792,
+  "overall_status": "DRIFT_ALERT",
+  "retrain_recommended": true,
+  "feature_metrics": {
+    "speed_limit": {
+      "type": "numerical",
+      "psi": 0.0012,
+      "ks_statistic": 0.0119,
+      "ks_pvalue": 0.036419,
+      "status": "STABLE"
+    },
+    "num_vehicles": {
+      "type": "numerical",
+      "psi": 0.0065,
+      "ks_statistic": 0.037,
+      "ks_pvalue": 0.0,
+      "status": "STABLE"
+    },
+    "temperature_2m": {
+      "type": "numerical",
+      "psi": 3.2461,
+      "ks_statistic": 0.4689,
+      "ks_pvalue": 0.0,
+      "status": "DRIFT_ALERT"
+    },
+    "precipitation": {
+      "type": "numerical",
+      "psi": 3.0158,
+      "ks_statistic": 0.3983,
+      "ks_pvalue": 0.0,
+      "status": "DRIFT_ALERT"
+    },
+    "wind_speed_10m": {
+      "type": "numerical",
+      "psi": 1.2651,
+      "ks_statistic": 0.3769,
+      "ks_pvalue": 0.0,
+      "status": "DRIFT_ALERT"
+    },
+    "road_type": {
+      "type": "categorical",
+      "psi": 0.0031,
+      "unique_categories": 6,
+      "status": "STABLE"
+    },
+    "junction_detail": {
+      "type": "categorical",
+      "psi": 0.0,
+      "unique_categories": 2,
+      "status": "STABLE"
+    },
+    "road_surface": {
+      "type": "categorical",
+      "psi": 0.7074,
+      "unique_categories": 6,
+      "status": "DRIFT_ALERT"
+    },
+    "light_condition": {
+      "type": "categorical",
+      "psi": 0.3176,
+      "unique_categories": 5,
+      "status": "DRIFT_ALERT"
+    },
+    "weather_condition": {
+      "type": "categorical",
+      "psi": 0.2299,
+      "unique_categories": 9,
+      "status": "WARNING"
+    },
+    "urban_or_rural": {
+      "type": "categorical",
+      "psi": 0.0003,
+      "unique_categories": 2,
+      "status": "STABLE"
+    }
+  }
+}

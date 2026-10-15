@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgis/postgis:15-3.3
+    container_name: accident_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-accident_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-accident_secure_password}
+      POSTGRES_DB: ${POSTGRES_DB:-accident_db}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./src/db/schema.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-accident_user} -d ${POSTGRES_DB:-accident_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - accident_network
+
+  api:
+    build:
+      context: .
+      dockerfile: src/api/Dockerfile
+    container_name: accident_api
+    restart: unless-stopped
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER:-accident_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-accident_secure_password}
+      - POSTGRES_DB=${POSTGRES_DB:-accident_db}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - accident_network
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: src/api/Dockerfile
+    container_name: accident_dashboard
+    restart: unless-stopped
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=${POSTGRES_USER:-accident_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-accident_secure_password}
+      - POSTGRES_DB=${POSTGRES_DB:-accident_db}
+    ports:
+      - "8501:8501"
+    command: ["streamlit", "run", "src/dashboard/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - accident_network
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.11.0
+    container_name: accident_mlflow
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlruns:/mlflow/mlruns
+      - ./mlflow.db:/mlflow/mlflow.db
+    command: ["mlflow", "server", "--backend-store-uri", "sqlite:////mlflow/mlflow.db", "--default-artifact-root", "/mlflow/mlruns", "--host", "0.0.0.0", "--port", "5000"]
+    networks:
+      - accident_network
+
+networks:
+  accident_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
